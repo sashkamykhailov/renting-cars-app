@@ -10,7 +10,7 @@ import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
 import { defaultStyles } from "@/constants/Styles";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useOAuth } from "@clerk/clerk-expo";
+import { useOAuth } from "@clerk/clerk-expo"; // хук для управління авторизацією від Clerk
 import { useRouter } from "expo-router";
 
 enum Strategy {
@@ -21,17 +21,22 @@ enum Strategy {
 
 const Login = () => {
 
-
   useWarmUpBrowser();
 
   const router = useRouter();
 
-  // 
+  // Отримує функцію googleAuth для ініціювання OAuth-потоку для Google.
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' }); 
+  //  Отримує функцію appleAuth для ініціювання OAuth-потоку для Apple.
   const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
+  // Отримує функцію facebookAuth для ініціювання OAuth-потоку для Facebook.
   const { startOAuthFlow: facebookAuth } = useOAuth({ strategy: 'oauth_facebook' });
 
+
+  // Функція, яка викликається при виборі методу авторизації.
   const onSelectAuth = async (strategy: Strategy) => {
+
+    //Визначає функцію OAuth, що відповідає обраній стратегії.
     const selectedAuth = {
       [Strategy.Google]: googleAuth,
       [Strategy.Apple]: appleAuth,
@@ -39,9 +44,12 @@ const Login = () => {
     }[strategy];
 
      try {
+      // Викликає обрану функцію OAuth та отримує createdSessionId та функцію setActive для налаштування сесії.
       const { createdSessionId, setActive } = await selectedAuth();
 
       if (createdSessionId) {
+
+        // Викликає setActive для встановлення активної сесії.
         setActive!({ session: createdSessionId });
         router.back();
       }
